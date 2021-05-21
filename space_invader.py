@@ -4,7 +4,7 @@ from pygame import joystick
 import random
 import os
 import json
-# test
+
 # Initialize the pygame
 pygame.init()
 
