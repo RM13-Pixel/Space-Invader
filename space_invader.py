@@ -30,8 +30,9 @@ screen = pygame.display.set_mode((screenX, screenY))
 # background = pygame.image.load("background1.png")
 
 # Background Music
+volume = 0.05
 mixer.music.load("8-bit Throne Room.wav")
-mixer.music.set_volume(0.35)
+mixer.music.set_volume(volume)
 mixer.music.play(-1)
 
 # Title and Icon
@@ -46,7 +47,7 @@ playerX = (screenX / 2) - (playerSize / 2)
 playerY = (screenY / 5) * 4
 playerX_change = 0
 playerY_change = 0
-playerSpeed = 0.8  # pixels to move
+playerSpeed = 1  # pixels to move
 
 # Enemy
 enemyImg = []
@@ -64,7 +65,7 @@ for i in range(enemy_count):
     enemyY.append(random.randint(50, 150))
     enemyX_change.append(0.6)
     enemyY_change.append(40)
-    enemySpeed.append(0.6)  # pixels to move
+    enemySpeed.append(0.9)  # pixels to move
 
 # Lasers
 # States: ready = waiting to be fired , fire = moving
@@ -72,7 +73,6 @@ laserImg = pygame.image.load("lasers.png")
 laserSize = 128
 laserX = 0
 laserY = playerY - 32
-laserX_change = 0
 laserY_change = 1.2
 laser_state = "ready"
 
@@ -95,6 +95,7 @@ def game_over_text():
     screen.blit(game_over, (130, 60))
     mixer.music.stop()
     game_over_sound = mixer.Sound("8-bit Emperor's Throne Room.wav")
+    game_over_sound.set_volume(volume)
     game_over_sound.play()
 
 
@@ -143,6 +144,7 @@ while running:
             if event.key == pygame.K_SPACE:
                 if laser_state == "ready":
                     laser_sound = mixer.Sound('laser sound.wav')
+                    laser_sound.set_volume(volume-0.5)
                     laser_sound.play()
                     laserX = playerX
                     laserY = playerY
@@ -198,7 +200,6 @@ while running:
         playerY = screenY - playerSize
     # Enemy Movement
     for i in range(enemy_count):
-
         # Game Over
         if enemyY[i] >= playerY - (playerSize / 1.5):
             for j in range(enemy_count):
@@ -217,7 +218,7 @@ while running:
         collision = is_collision(enemyX[i], enemyY[i], laserX, laserY)
         if collision:
             explosion_sound = mixer.Sound('explosion.wav')
-            explosion_sound.set_volume(0.2)
+            explosion_sound.set_volume(volume)
             explosion_sound.play()
             laserY = playerY
             laser_state = "ready"
@@ -236,6 +237,16 @@ while running:
         fire_laser(laserX, laserY)
         laserY -= laserY_change
 
+    if score_value%10 == 0 and enemy_count<score_value/10+3:
+        enemy_count+=1
+        enemyImg.append(pygame.image.load("tie2.png"))
+        enemyX.append(random.randint(0, screenX - enemySize))
+        enemyY.append(random.randint(50, 150))
+        enemyX_change.append(0.6)
+        enemyY_change.append(40)
+        enemySpeed.append(0.9+score_value/25)
+        playerSpeed += 0.2
+        laserY_change += 0.2
     player(playerX, playerY)
     show_score(textX, textY)
     pygame.display.update()
